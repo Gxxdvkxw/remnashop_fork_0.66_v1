@@ -56,18 +56,25 @@ class PromocodeType(StrEnum):
     PURCHASE_DISCOUNT = auto()
 
 
+class PlanType(StrEnum):
+    TRAFFIC = auto()
+    DEVICES = auto()
+    BOTH = auto()
+    UNLIMITED = auto()
+
+
+class PlanAvailability(StrEnum):
+    ALL = auto()
+    NEW = auto()
+    EXISTING = auto()
+    INVITED = auto()
+    ALLOWED = auto()
+
+
 class MaintenanceMode(StrEnum):
     GLOBAL = auto()
     PURCHASE = auto()
     OFF = auto()
-
-
-class SubscriptionStatus(StrEnum):
-    pass
-
-
-class PaymentMethod(StrEnum):
-    pass
 
 
 class Command(Enum):

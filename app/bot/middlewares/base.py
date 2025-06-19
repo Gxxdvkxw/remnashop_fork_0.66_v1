@@ -17,13 +17,13 @@ class EventTypedMiddleware(BaseMiddleware, ABC):
 
     def __init__(self) -> None:
         self.logger = logging.getLogger(f"{self.__class__.__module__}")
-        self.logger.info(f"{self.__class__.__name__} initialized")
+        self.logger.debug(f"{self.__class__.__name__} initialized")
 
     def setup_inner(self, router: Router) -> None:
         for event_type in self.__event_types__:
             router.observers[event_type].middleware(self)
 
-        self.logger.info(
+        self.logger.debug(
             f"{self.__class__.__name__} set as inner middleware for: "
             f"{', '.join(t.value for t in self.__event_types__)}"
         )
@@ -32,7 +32,7 @@ class EventTypedMiddleware(BaseMiddleware, ABC):
         for event_type in self.__event_types__:
             router.observers[event_type].outer_middleware(self)
 
-        self.logger.info(
+        self.logger.debug(
             f"{self.__class__.__name__} set as outer middleware for: "
             f"{', '.join(t.value for t in self.__event_types__)}"
         )

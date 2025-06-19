@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 if TYPE_CHECKING:
     from app.bot.middlewares import I18nMiddleware
@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 from aiogram.types import User as AiogramUser
 
 from app.core.enums import UserRole
-from app.core.formatters import format_log_user
 from app.db import SQLSessionContext
 from app.db.models.dto import UserDto
 from app.db.models.sql import User
@@ -35,15 +34,7 @@ class UserService(CrudService):
                 role=UserRole.DEV if is_dev else UserRole.USER,
             )
             await uow.commit(db_user)
-        self.logger.debug(f"{format_log_user(db_user)} Created in database")
         return db_user.dto()
-
-    async def _get(
-        self,
-        getter: Callable[[Any], Awaitable[Optional[User]]],
-        key: Any,
-    ) -> Optional[User]:
-        return await getter(key)
 
     async def get(self, telegram_id: int) -> Optional[UserDto]:
         async with SQLSessionContext(self.session_pool) as (repository, uow):
@@ -86,7 +77,6 @@ class UserService(CrudService):
                 telegram_id=user.telegram_id,
                 **user.model_state,
             )
-        self.logger.debug(f"{format_log_user(user)} Set is_blocked -> '{blocked}'")
 
     async def set_bot_blocked(self, user: UserDto, blocked: bool) -> None:
         user.is_bot_blocked = blocked
@@ -95,7 +85,6 @@ class UserService(CrudService):
                 telegram_id=user.telegram_id,
                 **user.model_state,
             )
-        self.logger.debug(f"{format_log_user(user)} Set is_bot_blocked -> '{blocked}'")
 
     async def set_role(self, user: UserDto, role: UserRole) -> None:
         user.role = role
@@ -104,4 +93,3 @@ class UserService(CrudService):
                 telegram_id=user.telegram_id,
                 **user.model_state,
             )
-        self.logger.debug(f"{format_log_user(user)} Set role -> '{role}'")

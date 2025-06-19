@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import TIMESTAMP, BigInteger, Boolean, Enum, Integer, String
+from sqlalchemy import TIMESTAMP, BigInteger, Boolean, Enum, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.constants import TIMEZONE
 from app.core.enums import UserRole
 from app.db.models.dto import UserDto
 
@@ -17,7 +16,7 @@ class User(Base):
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
 
     name: Mapped[str] = mapped_column(String, nullable=False)
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole), nullable=False, default=UserRole.USER)
+    role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.USER, nullable=False)
     language: Mapped[str] = mapped_column(String, nullable=False)
 
     personal_discount: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -28,13 +27,15 @@ class User(Base):
     is_trial_used: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), nullable=False, default=lambda: datetime.now(TIMEZONE)
+        TIMESTAMP(timezone=True),
+        default=func.now(),
+        nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
+        default=func.now(),
         nullable=False,
-        default=lambda: datetime.now(TIMEZONE),
-        onupdate=lambda: datetime.now(TIMEZONE),
+        onupdate=func.now(),
     )
 
     def dto(self) -> UserDto:
