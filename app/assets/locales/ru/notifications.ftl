@@ -1,7 +1,7 @@
 # Errors
-ntf-error-unknown-state = <i>⚠️ Ошибка: неизвестное состояние. Диалог перезапущен!</i>
-ntf-error-connect-remnawave = <i>⚠️ Ошибка: не удалось подключиться к Remnawave!</i>
-
+ntf-error-unknown-state = <i>⚠️ Ошибка: Неизвестное состояние. Диалог перезапущен</i>
+ntf-error-connect-remnawave = <i>⚠️ Ошибка: Не удалось подключиться к Remnawave</i>
+ntf-error-log-not-found = <i>⚠️ Ошибка: Лог файл не найден</i>
 
 # Events
 ntf-event-bot-startup =

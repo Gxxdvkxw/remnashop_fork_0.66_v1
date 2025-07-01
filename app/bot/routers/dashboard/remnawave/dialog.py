@@ -21,7 +21,7 @@ remnawave = Window(
             text=I18nFormat("btn-remnawave-users"),
             id="users",
             state=DashboardRemnawave.USERS,
-        )
+        ),
     ),
     Row(
         SwitchTo(
@@ -46,7 +46,7 @@ remnawave = Window(
             id="back",
             state=Dashboard.MAIN,
             mode=StartMode.RESET_STACK,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=DashboardRemnawave.MAIN,
@@ -61,7 +61,7 @@ users = Window(
             text=I18nFormat("btn-back"),
             id="back",
             state=DashboardRemnawave.MAIN,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=DashboardRemnawave.USERS,
@@ -76,7 +76,7 @@ hosts = Window(
             text=I18nFormat("btn-back"),
             id="back",
             state=DashboardRemnawave.MAIN,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=DashboardRemnawave.HOSTS,
@@ -91,7 +91,7 @@ nodes = Window(
             text=I18nFormat("btn-back"),
             id="back",
             state=DashboardRemnawave.MAIN,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=DashboardRemnawave.NODES,
@@ -106,7 +106,7 @@ inbounds = Window(
             text=I18nFormat("btn-back"),
             id="back",
             state=DashboardRemnawave.MAIN,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=DashboardRemnawave.INBOUNDS,

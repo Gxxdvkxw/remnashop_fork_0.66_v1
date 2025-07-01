@@ -208,6 +208,12 @@ class NotificationService(BaseService):
     async def notify_super_dev(self, text_key: str, **kwargs) -> bool:
         super_dev = await self.user_service.get(self.config.bot.dev_id)
 
+        if not super_dev:
+            self.logger.warning(
+                f"Super developer with ID '{self.config.bot.dev_id}' not found in database"
+            )
+            return False
+
         return await self._send_message(
             chat_id=super_dev.telegram_id,
             text_key=text_key,

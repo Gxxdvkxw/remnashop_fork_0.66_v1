@@ -70,14 +70,14 @@ role = Window(
             items="roles",
             type_factory=UserRole,
             on_click=on_role_selected,
-        )
+        ),
     ),
     Row(
         SwitchTo(
             text=I18nFormat("btn-back"),
             id="back",
             state=DashboardUser.MAIN,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=DashboardUser.ROLE,

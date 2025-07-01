@@ -17,6 +17,7 @@ class UserMiddleware(EventTypedMiddleware):
         MiddlewareEventType.MESSAGE,
         MiddlewareEventType.CALLBACK_QUERY,
         MiddlewareEventType.ERROR,
+        MiddlewareEventType.AIOGD_UPDATE,
     ]
 
     async def __call__(

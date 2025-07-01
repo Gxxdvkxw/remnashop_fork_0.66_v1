@@ -7,8 +7,7 @@ from aiogram_dialog.widgets.common import Whenable
 from aiogram_dialog.widgets.media import StaticMedia
 
 from app.bot.models.containers import AppContainer
-from app.core.config import DEFAULT_BANNERS_DIR
-from app.core.constants import APP_CONTAINER_KEY
+from app.core.constants import APP_CONTAINER_KEY, BANNERS_DIR
 from app.core.enums import BannerFormat, BannerName
 
 logger = logging.getLogger(__name__)
@@ -20,7 +19,7 @@ class Banner(StaticMedia):
         content_type: Optional[str] = None
 
         for format in BannerFormat:
-            candidate_path = DEFAULT_BANNERS_DIR / f"{name.value}.{format.value}"
+            candidate_path = BANNERS_DIR / f"{name.value}.{format.value}"
             if candidate_path.exists():
                 path = candidate_path
                 content_type = format.content_type
@@ -29,7 +28,7 @@ class Banner(StaticMedia):
 
         if path is None:
             logger.warning(f"Banner file for '{name.value}' not found (using default)")
-            path = DEFAULT_BANNERS_DIR / f"{BannerName.DEFAULT.value}.{BannerFormat.JPG.value}"
+            path = BANNERS_DIR / f"{BannerName.DEFAULT.value}.{BannerFormat.JPG.value}"
             content_type = BannerFormat.JPG.content_type
 
         if not path.exists():

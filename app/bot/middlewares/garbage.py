@@ -24,7 +24,7 @@ class GarbageMiddleware(EventTypedMiddleware):
         if user is None:
             return
 
-        if user.telegram_id != event.bot.id and event.text != f"/{Command.START.value.command}":
+        if event.text != f"/{Command.START.value.command}":
             await event.delete()
             self.logger.debug(f"{format_log_user(user)} Message deleted")
 

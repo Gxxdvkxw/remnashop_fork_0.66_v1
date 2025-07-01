@@ -15,6 +15,17 @@ from app.db.models import UserDto
 logger = logging.getLogger(__name__)
 
 
+async def reset_user_dialog(dialog_manager: DialogManager, target_user: UserDto):
+    bg_manager = dialog_manager.bg(
+        user_id=target_user.telegram_id,
+        chat_id=target_user.telegram_id,
+    )
+    await bg_manager.start(
+        state=MainMenu.MAIN,
+        mode=StartMode.RESET_STACK,
+    )
+
+
 async def handle_role_switch_preconditions(
     user: UserDto,
     target_user: UserDto,
@@ -32,7 +43,7 @@ async def handle_role_switch_preconditions(
 
     if target_user.telegram_id == container.config.bot.dev_id:
         logger.critical(
-            f"{format_log_user(user)} Attempted to switch role for {format_log_user(target_user)}."
+            f"{format_log_user(user)} Attempted to switch role for {format_log_user(target_user)}"
         )
 
         await container.services.user.set_role(user=user, role=UserRole.USER)
@@ -96,15 +107,11 @@ async def on_block_toggle(
         return
 
     await container.services.user.set_block(user=target_user, blocked=blocked)
+    await reset_user_dialog(dialog_manager, target_user)
     logger.info(
         f"{format_log_user(user)} {'Blocked' if blocked else 'Unblocked'} "
         f"{format_log_user(target_user)}"
     )
-    bg_manager = dialog_manager.bg(
-        user_id=target_user.telegram_id,
-        chat_id=target_user.telegram_id,
-    )
-    await bg_manager.start(state=MainMenu.MAIN, mode=StartMode.RESET_STACK)
 
 
 async def on_role_selected(
@@ -122,4 +129,5 @@ async def on_role_selected(
         return
 
     await container.services.user.set_role(user=target_user, role=UserRole(selected_role))
+    await reset_user_dialog(dialog_manager, target_user)
     logger.info(f"{format_log_user(user)} Switched role for {format_log_user(target_user)}")

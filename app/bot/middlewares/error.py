@@ -17,6 +17,7 @@ from app.core.enums import MiddlewareEventType
 from .base import EventTypedMiddleware
 
 
+# TODO: REWORK
 class ErrorMiddleware(EventTypedMiddleware):
     __event_types__ = [MiddlewareEventType.ERROR]
 
@@ -28,7 +29,9 @@ class ErrorMiddleware(EventTypedMiddleware):
     ) -> Any:
         aiogram_user: Optional[AiogramUser] = self._get_aiogram_user(event)
         container: AppContainer = data[APP_CONTAINER_KEY]
-        user = container.services.user.get(telegram_id=aiogram_user.id)
+
+        if aiogram_user:
+            user = container.services.user.get(telegram_id=aiogram_user.id)
 
         if isinstance(event.exception, TelegramForbiddenError):
             self.logger.info(f"[User:{aiogram_user.id} ({aiogram_user.full_name})] Blocked the bot")
@@ -48,7 +51,7 @@ class ErrorMiddleware(EventTypedMiddleware):
             text = Text(
                 Bold((type(event.exception).__name__)), f": {str(event.exception)[:1021]}..."
             )
-            await container.services.notification.notify_super_dev(text_key=text)
+            await container.services.notification.notify_super_dev(text_key=text.as_html())
 
         except TelegramBadRequest as exception:
             self.logger.warning(f"Failed to send error details: {exception}")

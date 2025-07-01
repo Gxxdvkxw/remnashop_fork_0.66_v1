@@ -5,6 +5,7 @@ from typing import ClassVar, Final, Optional, Union
 from aiogram import BaseMiddleware, Router
 from aiogram.types import CallbackQuery, ErrorEvent, Message
 from aiogram.types import User as AiogramUser
+from aiogram_dialog.api.entities.update_event import DialogUpdateEvent
 
 from app.core.enums import MiddlewareEventType
 
@@ -41,9 +42,13 @@ class EventTypedMiddleware(BaseMiddleware, ABC):
 
     @staticmethod
     def _get_aiogram_user(
-        event: Union[Message, CallbackQuery, ErrorEvent],
+        event: Union[Message, CallbackQuery, ErrorEvent, DialogUpdateEvent],
     ) -> Optional[AiogramUser]:
-        if isinstance(event, Message) or isinstance(event, CallbackQuery):
+        if (
+            isinstance(event, Message)
+            or isinstance(event, CallbackQuery)
+            or isinstance(event, DialogUpdateEvent)
+        ):
             return event.from_user
         elif isinstance(event, ErrorEvent):
             if event.update.callback_query:

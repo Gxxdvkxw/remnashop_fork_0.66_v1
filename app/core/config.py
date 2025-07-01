@@ -1,20 +1,15 @@
 import re
 import secrets
 from functools import lru_cache
-from pathlib import Path
 from typing import Optional, Self
 
 from pydantic import Field, SecretStr, field_validator
 from pydantic_core.core_schema import FieldValidationInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.core.constants import API_V1, DOMAIN_REGEX, WEBHOOK_PATH
+from app.core.constants import API_V1, BASE_DIR, DOMAIN_REGEX, WEBHOOK_PATH
 from app.core.enums import ArchiveFormat, Locale, LogLevel
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-DEFAULT_ASSETS_DIR = BASE_DIR / "app" / "assets"
-DEFAULT_BANNERS_DIR = DEFAULT_ASSETS_DIR / "banners"
-DEFAULT_LOCALES_DIR = DEFAULT_ASSETS_DIR / "locales"
 DEFAULT_I18N_LOCALES = [Locale.EN, Locale.RU]
 DEFAULT_I18N_LOCALE = Locale.EN
 
@@ -183,7 +178,6 @@ class LoggingConfig(BaseSettings, env_prefix="LOG_"):
 
 
 class I18nConfig(BaseSettings, env_prefix="I18N_"):
-    locales_dir: Path = DEFAULT_LOCALES_DIR
     locales: list[Locale] = DEFAULT_I18N_LOCALES
     default_locale: Locale = DEFAULT_I18N_LOCALE
 

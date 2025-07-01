@@ -168,7 +168,7 @@ plan_type = Window(
             items="types",
             type_factory=PlanType,
             on_click=on_type_selected,
-        )
+        ),
     ),
     Row(
         SwitchTo(
@@ -193,7 +193,7 @@ plan_availability = Window(
             items="availability",
             type_factory=PlanAvailability,
             on_click=on_availability_selected,
-        )
+        ),
     ),
     Row(
         SwitchTo(
@@ -307,7 +307,7 @@ plan_prices = Window(
             items="prices",
             type_factory=Currency,
             on_click=on_currency_selected,
-        )
+        ),
     ),
     Row(
         SwitchTo(

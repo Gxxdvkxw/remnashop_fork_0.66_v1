@@ -4,7 +4,7 @@ btn-back-menu = ⬅️ Вернуться в меню
 btn-back-dashboard = ⬅️ Вернуться в панель управления
 
 # Notification
-btn-close-notification = 🔔 Закрыть уведомление
+btn-close-notification = ❌ Закрыть
 
 
 # Menu

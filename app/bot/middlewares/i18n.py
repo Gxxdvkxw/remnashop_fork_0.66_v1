@@ -18,6 +18,7 @@ class I18nMiddleware(EventTypedMiddleware):
         MiddlewareEventType.MESSAGE,
         MiddlewareEventType.CALLBACK_QUERY,
         MiddlewareEventType.ERROR,
+        MiddlewareEventType.AIOGD_UPDATE,
     ]
 
     def __init__(
@@ -48,27 +49,25 @@ class I18nMiddleware(EventTypedMiddleware):
         user: Optional[UserDto] = None,
         locale: Optional[Locale] = None,
     ) -> FluentLocalization:
-        if locale is not None:
-            target_locale = locale
-        elif user is not None and user.language in self.locales:
-            target_locale = user.language
-        else:
-            target_locale = self.default_locale
+        target_locale: Locale
 
         if locale is not None:
+            target_locale = locale
             # self.logger.debug(f"Using explicitly provided locale: '{target_locale}'")
-            pass
-        elif user is not None:
-            if user.language in self.locales:
-                # self.logger.debug(f"{format_log_user(user)} Using locale: '{target_locale}'")
-                pass
+        elif user is not None and user.language in self.locales:
+            target_locale = user.language
+            # self.logger.debug(f"{format_log_user(user)} Using locale '{target_locale}'")
+        else:
+            target_locale = self.default_locale
+            if user is None:
+                self.logger.debug(
+                    f"User not provided or user's language not supported. Using default locale: '{self.default_locale}'"
+                )
             else:
                 self.logger.warning(
-                    f"Locale '{user.language}' for user '{user.id}' not supported. "
+                    f"Locale '{user.language}' for user '{user.telegram_id}' not supported. "
                     f"Using default locale: '{self.default_locale}'"
                 )
-        else:
-            self.logger.debug(f"User not provided. Using default locale: '{self.default_locale}'")
 
         if target_locale not in self.locales:
             self.logger.error(

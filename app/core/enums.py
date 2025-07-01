@@ -61,9 +61,9 @@ class BannerFormat(StrEnum):
 
 
 class MediaType(StrEnum):
-    PHOTO = ContentType.PHOTO
-    VIDEO = ContentType.VIDEO
-    DOCUMENT = ContentType.DOCUMENT
+    PHOTO = auto()
+    VIDEO = auto()
+    DOCUMENT = auto()
 
     def get_function(self, bot_instance: Bot) -> Callable[..., Any]:
         match self:
@@ -172,6 +172,7 @@ class Locale(StrEnum):
 
 
 class MiddlewareEventType(StrEnum):  # https://docs.aiogram.dev/en/latest/api/types/update.html
+    AIOGD_UPDATE = auto()  # AIOGRAM DIALOGS
     UPDATE = auto()
     MESSAGE = auto()
     EDITED_MESSAGE = auto()

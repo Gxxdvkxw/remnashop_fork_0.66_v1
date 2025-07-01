@@ -12,7 +12,7 @@ from app.bot.widgets import Banner, I18nFormat, IgnoreUpdate
 from app.core.enums import BannerName
 
 from .getters import admins_getter
-from .handlers import on_user_role_removed, on_user_selected
+from .handlers import on_logs_requested, on_user_role_removed, on_user_selected
 
 remnashop = Window(
     Banner(BannerName.DASHBOARD),
@@ -22,7 +22,12 @@ remnashop = Window(
             text=I18nFormat("btn-remnashop-admins"),
             id="admins",
             state=DashboardRemnashop.ADMINS,
-        )
+        ),
+        SwitchTo(
+            text=I18nFormat("btn-remnashop-admins"),
+            id="admins",
+            state=DashboardRemnashop.ADMINS,
+        ),
     ),
     Row(
         SwitchTo(
@@ -53,6 +58,7 @@ remnashop = Window(
         Button(
             text=I18nFormat("btn-remnashop-logs"),
             id="logs",
+            on_click=on_logs_requested,
         ),
         Button(
             text=I18nFormat("btn-remnashop-audit"),
@@ -65,7 +71,7 @@ remnashop = Window(
             id="back",
             state=Dashboard.MAIN,
             mode=StartMode.RESET_STACK,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=DashboardRemnashop.MAIN,
@@ -98,7 +104,7 @@ admins = Window(
             id="back",
             state=DashboardRemnashop.MAIN,
             mode=StartMode.RESET_STACK,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=DashboardRemnashop.ADMINS,

@@ -1,4 +1,10 @@
 from datetime import timezone
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parents[2]
+ASSETS_DIR = BASE_DIR / "app" / "assets"
+BANNERS_DIR = ASSETS_DIR / "banners"
+LOCALES_DIR = ASSETS_DIR / "locales"
 
 DOMAIN_REGEX = r"^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
 API_V1: str = "/api/v1"

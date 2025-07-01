@@ -17,21 +17,21 @@ notifications = Window(
             text=I18nFormat("btn-notifications-user"),
             id="users",
             state=RemnashopNotifications.USER,
-        )
+        ),
     ),
     Row(
         SwitchTo(
             text=I18nFormat("btn-notifications-system"),
             id="system",
             state=RemnashopNotifications.SYSTEM,
-        )
+        ),
     ),
     Row(
         Start(
             text=I18nFormat("btn-back"),
             id="back",
             state=DashboardRemnashop.MAIN,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=RemnashopNotifications.MAIN,
@@ -51,14 +51,14 @@ user = Window(
             item_id_getter=lambda item: item["type"],
             items="types",
             on_click=on_type_selected,
-        )
+        ),
     ),
     Row(
         SwitchTo(
             text=I18nFormat("btn-back"),
             id="back",
             state=RemnashopNotifications.MAIN,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=RemnashopNotifications.USER,
@@ -79,14 +79,14 @@ system = Window(
             item_id_getter=lambda item: item["type"],
             items="types",
             on_click=on_type_selected,
-        )
+        ),
     ),
     Row(
         SwitchTo(
             text=I18nFormat("btn-back"),
             id="back",
             state=RemnashopNotifications.MAIN,
-        )
+        ),
     ),
     IgnoreUpdate(),
     state=RemnashopNotifications.SYSTEM,

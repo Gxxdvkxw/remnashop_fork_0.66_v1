@@ -16,7 +16,7 @@ from app.bot.middlewares import (
     UserMiddleware,
 )
 from app.bot.middlewares.base import EventTypedMiddleware
-from app.core.constants import RESOURCE_I18N
+from app.core.constants import LOCALES_DIR, RESOURCE_I18N
 
 
 class Middlewares(NamedTuple):
@@ -25,7 +25,7 @@ class Middlewares(NamedTuple):
 
 
 def create_i18n_middleware(config: AppConfig) -> I18nMiddleware:
-    loader = FluentResourceLoader(roots=f"{config.i18n.locales_dir}/{{locale}}")
+    loader = FluentResourceLoader(roots=f"{LOCALES_DIR}/{{locale}}")
     locales = {
         locale: FluentLocalization(
             locales=[locale, config.i18n.default_locale],
