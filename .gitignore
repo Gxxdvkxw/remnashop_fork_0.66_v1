@@ -8,7 +8,6 @@ tests
 traefik
 logs/*
 !logs/.gitkeep
-ftl.py
 
 # Environment
 .venv/

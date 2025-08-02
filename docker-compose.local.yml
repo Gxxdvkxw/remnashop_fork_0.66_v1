@@ -8,9 +8,9 @@ services:
     env_file:
       - .env
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
       - TZ=UTC
     volumes:
       - remnashop-db-data:/var/lib/postgresql/data
@@ -40,10 +40,11 @@ services:
     restart: always
 
   remnashop:
+    &remnashop
     build:
       context: .
       dockerfile: Dockerfile.local
-    container_name: "remnashop_local"
+    container_name: "remnashop-local"
     hostname: remnashop
     env_file:
       - .env
@@ -53,11 +54,22 @@ services:
         remnashop-redis:
           condition: service_healthy
     volumes:
-      - ./app:/opt/remnashop/app
+      - ./src:/opt/remnashop/src
       - ./logs:/opt/remnashop/logs
+      - ./assets:/opt/remnashop/assets
     networks:
       - remnashop-network
     restart: always
+
+  remnashop-taskiq-worker:
+    <<: *remnashop
+    container_name: "remnashop-taskiq-worker"
+    hostname: remnashop-taskiq-worker
+    command: taskiq worker src.infrastructure.taskiq.broker:worker 
+      --tasks-pattern src/infrastructure/taskiq/tasks -fsd
+    depends_on:
+      remnashop-redis:
+        condition: service_healthy
 
 networks:
   remnashop-network:

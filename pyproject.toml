@@ -11,14 +11,17 @@ dependencies = [
     "aiogram-dialog~=2.3.1",
     "alembic~=1.15.2",
     "asyncpg~=0.30.0",
+    "dishka~=1.6.0",
     "fastapi>=0.115.12",
-    "fluent-runtime~=0.4.0",
+    "fluentogram~=1.2.1",
     "greenlet>=3.2.2",
     "loguru~=0.7.3",
     "msgspec~=0.19.0",
     "pydantic-settings~=2.9.1",
-    "redis~=6.1.0",
+    "redis~=6.2.0",
     "remnawave-api~=1.1.2",
+    "taskiq~=0.11.18",
+    "taskiq-redis~=1.1.0",
     "uvicorn>=0.34.2",
 ]
 
@@ -32,13 +35,12 @@ dev-dependencies = [
     "ruff>=0.8.6",
     "pytest>=8.4.0",
     "watchfiles>=1.1.0",
-    "types-cachetools",
+    "ftl-extract>=0.9.0a9",
 ]
 
 [tool.black]
 line-length = 100
 exclude = "\\.?venv|\\.?tests"
-
 
 [tool.ruff]
 target-version = "py312"

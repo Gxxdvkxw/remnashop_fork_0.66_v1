@@ -3,7 +3,7 @@ set -e
 
 echo "Migrating database..."
 
-if ! uv run alembic -c app/db/alembic.ini upgrade head; then
+if ! uv run alembic -c src/infrastructure/database/alembic.ini upgrade head; then
     echo "Database migration failed! Exiting container..."
     exit 1
 fi
@@ -13,9 +13,9 @@ echo "Migrations deployed successfully!"
 UVICORN_RELOAD_ARGS=""
 if [ "$UVICORN_RELOAD_ENABLED" = "true" ]; then
   echo "Uvicorn will run with reload enabled."
-  UVICORN_RELOAD_ARGS="--reload --reload-dir /opt/remnashop/app --reload-include *.ftl"
+  UVICORN_RELOAD_ARGS="--reload --reload-dir /opt/remnashop/src --reload-dir /opt/remnashop/assets --reload-include *.ftl"
 else
   echo "Uvicorn will run without reload."
 fi
 
-exec uv run uvicorn app.__main__:app --host "${APP_HOST}" --port "${APP_PORT}" ${UVICORN_RELOAD_ARGS}
+exec uv run uvicorn src.__main__:application --host "${APP_HOST}" --port "${APP_PORT}" --factory --use-colors ${UVICORN_RELOAD_ARGS}

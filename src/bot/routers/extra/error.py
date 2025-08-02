@@ -1,0 +1,37 @@
+from aiogram.types import ErrorEvent
+from aiogram_dialog import DialogManager
+from dishka import FromDishka
+from loguru import logger
+
+from src.bot.routers.menu.handlers import on_start_command
+from src.core.utils.formatters import format_log_user
+from src.infrastructure.database.models.dto import UserDto
+from src.services import NotificationService
+
+# Registered in main router (src/bot/dispatcher.py)
+
+
+async def on_unknown_state(
+    event: ErrorEvent,
+    user: UserDto,
+    dialog_manager: DialogManager,
+    notification_service: FromDishka[NotificationService],
+) -> None:
+    logger.error(f"{format_log_user(user)} Unknown state")
+    await notification_service.notify_user(user=user, text_key="ntf-error-unknown-state")
+
+    logger.debug(f"{format_log_user(user)} Restarting dialog")
+    await on_start_command(message=event.update.message, user=user, dialog_manager=dialog_manager)
+
+
+async def on_unknown_intent(
+    event: ErrorEvent,
+    user: UserDto,
+    dialog_manager: DialogManager,
+    notification_service: FromDishka[NotificationService],
+) -> None:
+    logger.error(f"{format_log_user(user)} Unknown intent")
+    await notification_service.notify_user(user=user, text_key="ntf-error-unknown-intent")
+
+    logger.debug(f"{format_log_user(user)} Restarting dialog")
+    await on_start_command(message=event.update.message, user=user, dialog_manager=dialog_manager)

@@ -1,0 +1,27 @@
+from collections.abc import AsyncGenerator
+
+from dishka import Provider, Scope, provide
+from redis.asyncio import ConnectionPool, Redis
+
+from src.core.config import AppConfig
+from src.infrastructure.redis import RedisRepository
+
+
+class RedisProvider(Provider):
+    scope = Scope.APP
+
+    @provide
+    async def get_redis_client(self, config: AppConfig) -> AsyncGenerator[Redis, None]:
+        connection_pool = ConnectionPool.from_url(url=config.redis.dsn)
+        client = Redis(connection_pool=connection_pool)
+
+        await client.ping()
+
+        yield client
+
+        await client.close()
+        await connection_pool.disconnect()
+
+    @provide
+    def get_redis_repository(self, config: AppConfig, client: Redis) -> RedisRepository:
+        return RedisRepository(config=config, client=client)

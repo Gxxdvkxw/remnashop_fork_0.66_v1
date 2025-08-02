@@ -1,0 +1,44 @@
+from aiogram import Router
+from aiogram.filters import ExceptionTypeFilter
+from aiogram_dialog.api.exceptions import UnknownIntent, UnknownState
+
+from src.bot.routers.extra.error import on_unknown_intent, on_unknown_state
+
+from . import dashboard, extra, menu
+from .dashboard import broadcast, promocodes, remnashop, remnawave, users
+
+__all__ = [
+    "setup_routers",
+]
+
+
+def setup_routers(router: Router):
+    # WARNING: The order of router registration matters!
+    routers = [
+        extra.notification.router,
+        extra.test.router,
+        extra.member.router,
+        #
+        menu.handlers.router,
+        menu.dialog.router,
+        #
+        dashboard.dialog.router,
+        broadcast.dialog.router,
+        promocodes.dialog.router,
+        #
+        remnashop.dialog.router,
+        remnashop.notifications.dialog.router,
+        remnashop.plans.dialog.router,
+        #
+        remnawave.dialog.router,
+        #
+        users.dialog.router,
+        users.user.dialog.router,
+    ]
+
+    router.include_routers(*routers)
+
+
+def setup_error_handlers(router: Router):
+    router.errors.register(on_unknown_intent, ExceptionTypeFilter(UnknownIntent))
+    router.errors.register(on_unknown_state, ExceptionTypeFilter(UnknownState))

@@ -1,9 +1,10 @@
-ALEMBIC_INI=app/db/alembic.ini
+ALEMBIC_INI=src/infrastructure/database/alembic.ini
 
 .PHONY: setup-env
 setup-env:
 	@sed -i '' "s/^BOT_SECRET_TOKEN=.*/BOT_SECRET_TOKEN=$(shell openssl rand -hex 32)/" .env
-	@sed -i '' "s/^DB_PASSWORD=.*/DB_PASSWORD=$(shell openssl rand -hex 24)/" .env
+	@sed -i '' "s/^DATABASE_PASSWORD=.*/DATABASE_PASSWORD=$(shell openssl rand -hex 24)/" .env
+	@sed -i '' "s/^REDIS_PASSWORD=.*/REDIS_PASSWORD=$(shell openssl rand -hex 24)/" .env
 	@echo "Secrets updated. Check your .env file"
 
 .PHONY: migration
