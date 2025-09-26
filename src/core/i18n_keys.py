@@ -7,6 +7,7 @@ class UtilKey(StrEnum):
     UNLIMITED = "unlimited"
     SPACE = "space"
     SEPARATOR = "separator"
+    UNIT_UNLIMITED = "unit-unlimited"
 
 
 class ByteUnitKey(StrEnum):

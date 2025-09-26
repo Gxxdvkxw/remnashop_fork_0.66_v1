@@ -4,20 +4,26 @@ from .payment_gateway import (
     CryptomusGatewaySettingsDto,
     HeleketGatewaySettingsDto,
     PaymentGatewayDto,
+    PaymentResult,
     # TelegramStarsGatewaySettingsDto,
     YookassaGatewaySettingsDto,
     YoomoneyGatewaySettingsDto,
 )
 from .plan import PlanDto, PlanDurationDto, PlanPriceDto, PlanSnapshotDto
 from .promocode import PromocodeActivationDto, PromocodeDto
-from .subscription import SubscriptionDto
-from .transaction import TransactionDto
-from .user import UserDto
+from .subscription import BaseSubscriptionDto, SubscriptionDto
+from .transaction import BaseTransactionDto, PriceDetailsDto, TransactionDto
+from .user import BaseUserDto, UserDto
 
-PaymentGatewayDto.model_rebuild()
+BaseSubscriptionDto.model_rebuild()
 SubscriptionDto.model_rebuild()
-TransactionDto.model_rebuild()
+BaseUserDto.model_rebuild()
 UserDto.model_rebuild()
+PromocodeActivationDto.model_rebuild()
+BaseTransactionDto.model_rebuild()
+TransactionDto.model_rebuild()
+PaymentGatewayDto.model_rebuild()
+
 
 __all__ = [
     "BaseDto",
@@ -26,6 +32,7 @@ __all__ = [
     "CryptomusGatewaySettingsDto",
     "HeleketGatewaySettingsDto",
     "PaymentGatewayDto",
+    "PaymentResult",
     # "TelegramStarsGatewaySettingsDto",
     "YookassaGatewaySettingsDto",
     "YoomoneyGatewaySettingsDto",
@@ -36,6 +43,7 @@ __all__ = [
     "PromocodeDto",
     "PromocodeActivationDto",
     "SubscriptionDto",
+    "PriceDetailsDto",
     "TransactionDto",
     "UserDto",
 ]

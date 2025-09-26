@@ -83,3 +83,15 @@ async def on_payment_method_selected(
 ) -> None:
     dialog_manager.dialog_data["selected_payment_method"] = selected_payment_method
     await dialog_manager.switch_to(state=Subscription.CONFIRM)
+
+
+@inject
+async def on_get_subscription(
+    callback: CallbackQuery,
+    widget: Button,
+    dialog_manager: DialogManager,
+    payment_gateway_service: FromDishka[PaymentGatewayService],
+) -> None:
+    payment_id = dialog_manager.dialog_data["payment_id"]
+    await payment_gateway_service.handle_payment_succeeded(payment_id)
+    return

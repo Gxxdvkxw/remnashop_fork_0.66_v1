@@ -58,7 +58,7 @@ class PromocodeActivation(BaseSql):
     )
 
     activated_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         server_default=NOW_FUNC,
         nullable=False,
     )

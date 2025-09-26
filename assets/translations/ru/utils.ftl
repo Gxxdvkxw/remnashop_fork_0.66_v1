@@ -5,6 +5,7 @@ unlimited = ∞
 development = В разработке
 test-payment = Тестовый платеж
 
+
 # Remnashop
 ntf-remnashop = 
     <b>💎 remnashop</b>
@@ -21,9 +22,11 @@ btn-remnashop-donate = Поддержать разработчика
 # Payment
 payment-invoice-description = { $name } { $traffic } { $devices } { $duration }
 
+
 # Commands
 cmd-start = Перезапустить бота
 cmd-help = Помощь
+
 
 # Used to create a blank line between elements
 space = {" "}
@@ -86,6 +89,11 @@ unit-year = { $value } { $value ->
     *[other] лет
 }
 
+unit-unlimited = { $value ->
+    [-1] { unlimited }
+    *[other] { $value }
+}
+
 
 # Types
 plan-type = { $plan_type -> 
@@ -104,4 +112,3 @@ gateway-type = { $gateway_type ->
     [HELEKET] Heleket
     *[OTHER] { $gateway_type }
 }
-

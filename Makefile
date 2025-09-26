@@ -10,10 +10,7 @@ setup-env:
 
 .PHONY: migration
 migration:
-ifndef message
-	$(error message is undefined. Use: make migration message="Your message")
-endif
-	alembic -c $(ALEMBIC_INI) revision --autogenerate -m "$(message)"
+	alembic -c $(ALEMBIC_INI) revision --autogenerate
 
 .PHONY: migrate
 migrate:

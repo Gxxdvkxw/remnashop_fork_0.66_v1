@@ -23,7 +23,12 @@ async def on_test_command(
     user: UserDto,
 ) -> None:
     logger.info(f"{format_log_user(user)} Test command executed")
-    raise UnknownState("test_state")
+
+    logger.critical(user.transactions)
+    logger.critical(user.active_subscription)
+    logger.critical(user.subscriptions)
+    logger.critical(user.promocode_activations)
+    # raise UnknownState("test_state")
     # raise UnknownIntent("test_intent")
 
 

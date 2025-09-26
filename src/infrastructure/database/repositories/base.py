@@ -81,7 +81,9 @@ class BaseRepository:
         obj_id: Optional[int] = result.scalar_one_or_none()
 
         if obj_id is not None and load_result:
-            return await self.session.get(model, obj_id)
+            db_obj = await self.session.get(model, obj_id)
+            await self.session.refresh(db_obj)
+            return db_obj
 
         return None
 

@@ -346,9 +346,13 @@ msg-subscription-duration-details =
     }
 
 msg-subscription-price-details =
-    { $price -> 
+    { $final_amount -> 
     [0] {space}
-    *[has] • Стоимость: { $price } { $currency }
+    *[has] • Стоимость: <b>{ $final_amount } { $currency }</b>
+        { $discount_percent -> 
+        [0] { space }
+        *[more] <strike>{ $original_amount } { $currency }</strike> ({ $discount_percent }%)
+        }
     }
 
 msg-subscription-details =

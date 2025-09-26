@@ -6,11 +6,13 @@ from dishka.integrations.aiogram_dialog import inject
 from fluentogram import TranslatorRunner
 
 from src.core.constants import USER_KEY
+from src.core.enums import PurchaseType
 from src.core.utils.adapter import DialogDataAdapter
 from src.core.utils.formatters import i18n_format_days_to_duration
 from src.infrastructure.database.models.dto import PlanDto, PlanSnapshotDto, UserDto
 from src.services.payment_gateway import PaymentGatewayService
 from src.services.plan import PlanService
+from src.services.pricing import PricingService
 
 
 @inject
@@ -77,7 +79,7 @@ async def duration_getter(
         "traffic": plan.traffic_limit,
         "period": 0,
         "durations": durations,
-        "price": 0,
+        "final_amount": 0,
         "currency": "",
     }
 
@@ -121,7 +123,7 @@ async def payment_method_getter(
         "traffic": plan.traffic_limit,
         "period": i18n.get(key, **kw),
         "payment_methods": payment_methods,
-        "price": 0,
+        "final_amount": 0,
         "currency": "",
     }
 
@@ -159,13 +161,16 @@ async def confirm_getter(
     )
 
     price = duration.get_price(payment_gateway.currency)
+    pricing = PricingService.calculate(user, price, payment_gateway.currency)
 
-    url = await payment_gateway_service.create_payment(
+    result = await payment_gateway_service.create_payment(
         user=user,
         plan=transaction_plan,
-        price=price,
+        pricing=pricing,
+        purchase_type=PurchaseType.CHANGE,
         gateway_type=selected_payment_method,
     )
+    dialog_manager.dialog_data["payment_id"] = result.payment_id
 
     key, kw = i18n_format_days_to_duration(duration.days)
 
@@ -176,7 +181,9 @@ async def confirm_getter(
         "traffic": plan.traffic_limit,
         "period": i18n.get(key, **kw),
         "payment_method": selected_payment_method,
-        "price": price,
+        "final_amount": pricing.final_amount,
+        "discount_percent": pricing.discount_percent,
+        "original_amount": pricing.original_amount,
         "currency": payment_gateway.currency.symbol,
-        "url": url,
+        "url": result.pay_url,
     }

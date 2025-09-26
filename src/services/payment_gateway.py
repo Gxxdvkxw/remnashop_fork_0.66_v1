@@ -15,17 +15,19 @@ from src.core.enums import (
     Currency,
     Locale,
     PaymentGatewayType,
+    PurchaseType,
     SystemNotificationType,
     TransactionStatus,
 )
 from src.core.storage_keys import DefaultCurrencyKey
-from src.core.utils.formatters import i18n_format_days_to_duration
+from src.core.utils.formatters import i18n_format_days_to_duration, i18n_format_limit
 from src.infrastructure.database import UnitOfWork
 from src.infrastructure.database.models.dto import (
     AnyGatewaySettingsDto,
     PaymentGatewayDto,
+    PaymentResult,
     PlanSnapshotDto,
-    SubscriptionDto,
+    PriceDetailsDto,
     TransactionDto,
     UserDto,
 )
@@ -33,6 +35,7 @@ from src.infrastructure.payment_gateways import BasePaymentGateway, PaymentGatew
 from src.infrastructure.redis import RedisRepository
 from src.infrastructure.taskiq.tasks.notifications import send_system_notification_task
 from src.infrastructure.taskiq.tasks.redirects import redirect_to_main_menu_task
+from src.infrastructure.taskiq.tasks.subscriptions import create_subscription_task
 from src.services.subscription import SubscriptionService
 
 from .base import BaseService
@@ -100,9 +103,10 @@ class PaymentGatewayService(BaseService):
         self,
         user: UserDto,
         plan: PlanSnapshotDto,
-        price: Decimal,
+        pricing: PriceDetailsDto,
+        purchase_type: PurchaseType,
         gateway_type: PaymentGatewayType,
-    ) -> str:
+    ) -> PaymentResult:
         gateway_instance = await self._get_gateway_instance(gateway_type)
 
         i18n = self.translator_hub.get_translator_by_locale(locale=user.language)
@@ -118,20 +122,25 @@ class PaymentGatewayService(BaseService):
         transaction = TransactionDto(
             payment_id=payment_id,
             status=TransactionStatus.PENDING,
-            gateway=gateway_instance.gateway.type,
-            amount=price,
+            purchase_type=purchase_type,
+            gateway_type=gateway_instance.gateway.type,
+            pricing=pricing,
             currency=gateway_instance.gateway.currency,
             plan=plan,
         )
         await self.transaction_service.create(user, transaction)
 
+        if pricing.is_free:
+            logger.info(f"Free transaction created for user '{user.telegram_id}'")
+            return PaymentResult(payment_id=payment_id)
+
         pay_url = await gateway_instance.handle_create_payment(
             payment_id=str(payment_id),
-            amount=price,
+            amount=pricing.final_amount,
             details=details,
         )
         logger.info(f"Payment link created for user '{user.telegram_id}': '{pay_url}'")
-        return pay_url
+        return PaymentResult(payment_id=payment_id, pay_url=pay_url)
 
     async def create_test_payment(self, gateway_type: PaymentGatewayType) -> str:
         gateway_instance = await self._get_gateway_instance(gateway_type)
@@ -159,45 +168,82 @@ class PaymentGatewayService(BaseService):
             logger.critical("")
             return
 
-        logger.info(f"Payment succeeded '{payment_id}' from '{transaction.user.telegram_id}'")
+        if transaction.is_completed:
+            logger.critical("")
+            return
 
         transaction.status = TransactionStatus.COMPLETED
         await self.transaction_service.update(transaction)
 
+        logger.info(f"Payment succeeded '{payment_id}' from '{transaction.user.telegram_id}'")
+
         # TODO: refferal
-        # TODO: split notifications on types
-        i18n_key = "ntf-event-subscription-purchase"
+
+        i18n_keys = {
+            PurchaseType.NEW: "ntf-event-subscription-new",
+            PurchaseType.RENEW: "ntf-event-subscription-renew",
+            PurchaseType.CHANGE: "ntf-event-subscription-change",
+        }
+        i18n_key = i18n_keys[transaction.purchase_type]
+
+        # TODO: Simplify
+        extra_i18n_kwargs = {}
+        if transaction.purchase_type == PurchaseType.CHANGE:
+            subscription = await self.subscription_service.get_active(transaction.user.telegram_id)
+            extra_i18n_kwargs = {
+                "previous_plan_name": subscription.plan.name if subscription else "N/A",
+                "previous_plan_type": {
+                    "key": "plan-type",
+                    "plan_type": subscription.plan.type if subscription else "N/A",
+                },
+                "previous_plan_traffic_limit": i18n_format_limit(subscription.plan.traffic_limit)
+                if subscription
+                else "N/A",
+                "previous_plan_device_limit": i18n_format_limit(subscription.plan.device_limit)
+                if subscription
+                else "N/A",
+                "previous_plan_duration": i18n_format_days_to_duration(subscription.plan.duration)
+                if subscription
+                else "N/A",
+            }
+
+        i18n_kwargs = {
+            "payment_id": transaction.payment_id,
+            "gateway_type": transaction.gateway_type,
+            "final_amount": transaction.pricing.final_amount.normalize(),
+            "discount_percent": transaction.pricing.discount_percent,
+            "original_amount": transaction.pricing.original_amount.normalize(),
+            "currency": transaction.currency.symbol,
+            "user_id": str(transaction.user.telegram_id),
+            "user_name": transaction.user.name,
+            "user_username": transaction.user.username or False,
+            "plan_name": transaction.plan.name,
+            "plan_type": transaction.plan.type,
+            "plan_traffic_limit": i18n_format_limit(transaction.plan.traffic_limit),
+            "plan_device_limit": i18n_format_limit(transaction.plan.device_limit),
+            "plan_duration": i18n_format_days_to_duration(transaction.plan.duration),
+        }
 
         await send_system_notification_task.kiq(
             ntf_type=SystemNotificationType.SUBSCRIPTION,
             i18n_key=i18n_key,
-            i18n_kwargs={
-                "payment_id": transaction.payment_id,
-                "gateway_type": transaction.gateway,
-                "payment_amount": transaction.amount.normalize(),
-                "currency": transaction.currency.symbol,
-                "user_id": str(transaction.user.telegram_id),
-                "user_name": transaction.user.name,
-                "user_username": transaction.user.username or False,
-                "plan_name": transaction.plan.name,
-                "plan_type": transaction.plan.type,
-                "plan_traffic_limit": transaction.plan.traffic_limit,
-                "plan_device_limit": transaction.plan.device_limit,
-                "plan_duration": i18n_format_days_to_duration(transaction.plan.duration),
-            },
+            i18n_kwargs={**i18n_kwargs, **extra_i18n_kwargs},
         )
         await redirect_to_main_menu_task.kiq(transaction.user)
-
-        # TODO: subscription remnawave
-
-        # subscription = SubscriptionDto(plan=transaction.plan)
-
-        # await self.subscription_service.create(subscription)
-        await self.subscription_service.create_remnawave(transaction.user, transaction.plan)
-        logger.success("Subscription!!!")
+        await create_subscription_task.kiq(transaction.user, transaction.plan)
+        logger.debug("Called tasks for payment")
 
     async def handle_payment_canceled(self, payment_id: UUID) -> None:
-        pass
+        transaction = await self.transaction_service.get(payment_id)
+
+        if not transaction or not transaction.user:
+            logger.critical("")
+            return
+
+        logger.info(f"Payment canceled '{payment_id}' from '{transaction.user.telegram_id}'")
+
+        transaction.status = TransactionStatus.CANCELED
+        await self.transaction_service.update(transaction)
 
     #
 

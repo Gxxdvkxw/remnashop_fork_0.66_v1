@@ -1,10 +1,16 @@
 from typing import Any, Optional, Union
+from uuid import UUID
 
 from pydantic import SecretStr
 
 from src.core.enums import Currency, PaymentGatewayType, YookassaVatCode
 
 from .base import TrackableDto
+
+
+class PaymentResult(TrackableDto):
+    payment_id: UUID
+    pay_url: Optional[str] = None
 
 
 class PaymentGatewayDto(TrackableDto):
@@ -15,7 +21,7 @@ class PaymentGatewayDto(TrackableDto):
     currency: Currency
     is_active: bool
 
-    settings: Optional["AnyGatewaySettingsDto"] = None
+    settings: "Optional[AnyGatewaySettingsDto]" = None
 
 
 class GatewaySettingsDto(TrackableDto):

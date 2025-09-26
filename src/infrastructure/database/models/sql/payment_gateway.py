@@ -4,6 +4,7 @@ from sqlalchemy import JSON, Boolean, Enum, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core.enums import Currency, PaymentGatewayType
+from src.infrastructure.database.models.dto import AnyGatewaySettingsDto
 
 from .base import BaseSql
 
@@ -21,4 +22,4 @@ class PaymentGateway(BaseSql):
 
     currency: Mapped[Currency] = mapped_column(Enum(Currency), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    settings: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    settings: Mapped[Optional[AnyGatewaySettingsDto]] = mapped_column(JSON, nullable=True)

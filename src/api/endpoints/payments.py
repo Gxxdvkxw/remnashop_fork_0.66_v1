@@ -13,7 +13,7 @@ router = APIRouter(prefix=API_V1 + PAYMENTS_WEBHOOK_PATH)
 
 @router.post("/{gateway_type}")
 @inject
-async def generic_webhook(
+async def payments_webhook(
     gateway_type: str,
     request: Request,
     payment_gateway_service: FromDishka[PaymentGatewayService],

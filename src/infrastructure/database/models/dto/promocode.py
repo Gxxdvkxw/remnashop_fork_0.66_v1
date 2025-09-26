@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from .user import UserDto
+    from .user import BaseUserDto
 
 from datetime import datetime, timedelta
 
@@ -27,7 +27,7 @@ class PromocodeDto(TrackableDto):
     lifetime: Optional[int] = None
     max_activations: Optional[int] = None
 
-    activations: list["PromocodeActivationDto"] = []
+    activations: "list[PromocodeActivationDto]" = []
 
     created_at: Optional[datetime] = Field(default=None, frozen=True)
     updated_at: Optional[datetime] = Field(default=None, frozen=True)
@@ -79,5 +79,5 @@ class PromocodeActivationDto(BaseDto):
 
     activated_at: Optional[datetime] = Field(default=None, frozen=True)
 
-    promocode: Optional["PromocodeDto"] = None
-    user: Optional["UserDto"] = None
+    promocode: "Optional[PromocodeDto]" = None
+    user: "Optional[BaseUserDto]" = None

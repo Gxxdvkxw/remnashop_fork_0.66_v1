@@ -3,7 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from .subscription import SubscriptionDto
+    from .promocode import PromocodeActivationDto
+    from .subscription import BaseSubscriptionDto
+    from .transaction import BaseTransactionDto
 
 from datetime import datetime
 
@@ -16,7 +18,7 @@ from src.core.utils.time import datetime_now
 from .base import TrackableDto
 
 
-class UserDto(TrackableDto):
+class BaseUserDto(TrackableDto):
     id: Optional[int] = Field(default=None, frozen=True)
     telegram_id: int
     username: Optional[str] = None
@@ -31,8 +33,6 @@ class UserDto(TrackableDto):
     is_blocked: bool = False
     is_bot_blocked: bool = False
     is_trial_used: bool = False
-
-    subscription: Optional["SubscriptionDto"] = None
 
     created_at: Optional[datetime] = Field(default=None, frozen=True)
     updated_at: Optional[datetime] = Field(default=None, frozen=True)
@@ -63,3 +63,10 @@ class UserDto(TrackableDto):
             return None
 
         return (datetime_now() - self.created_at).days
+
+
+class UserDto(BaseUserDto):
+    active_subscription: "Optional[BaseSubscriptionDto]" = None
+    subscriptions: "list[BaseSubscriptionDto]" = []
+    promocode_activations: "list[PromocodeActivationDto]" = []
+    transactions: "list[BaseTransactionDto]" = []

@@ -110,7 +110,6 @@ async def prices_getter(dialog_manager: DialogManager, **kwargs: Any) -> dict[st
 async def price_getter(dialog_manager: DialogManager, **kwargs: Any) -> dict[str, Any]:
     duration_selected = dialog_manager.dialog_data.get("duration_selected")
     currency_selected = dialog_manager.dialog_data.get("currency_selected")
-    logger.info(currency_selected)
     return {
         "duration": duration_selected,
         "currency": currency_selected,

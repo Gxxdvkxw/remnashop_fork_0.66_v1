@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+from calendar import monthrange
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Final, Optional, Union
+
+from src.core.utils.time import datetime_now
 
 if TYPE_CHECKING:
     from src.infrastructure.database.models.dto import UserDto
@@ -12,6 +16,19 @@ from src.core.i18n_keys import ByteUnitKey, TimeUnitKey, UtilKey
 
 def format_log_user(user: UserDto) -> str:
     return f"[{user.role.upper()}:{user.telegram_id} ({user.name})]"
+
+
+def format_days_to_datetime(value: int, year: int = 2099) -> datetime:
+    dt = datetime_now()
+
+    if value == -1:  # UNLIMITED
+        try:
+            return dt.replace(year=year)
+        except ValueError:
+            last_day = monthrange(year, dt.month)[1]
+            return dt.replace(year=year, day=min(dt.day, last_day))
+
+    return dt + timedelta(days=value)
 
 
 def format_device_count(value: int) -> int:
@@ -112,3 +129,7 @@ def i18n_format_days_to_duration(value: int) -> tuple[str, dict[str, int]]:
         return TimeUnitKey.MONTH, {"value": value // 30}
 
     return TimeUnitKey.DAY, {"value": value}
+
+
+def i18n_format_limit(value: int) -> tuple[str, dict[str, int]]:
+    return UtilKey.UNIT_UNLIMITED, {"value": value}

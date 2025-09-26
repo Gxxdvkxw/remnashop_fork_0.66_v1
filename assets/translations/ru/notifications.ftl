@@ -61,11 +61,17 @@ ntf-event-new-user =
     }
     </blockquote>
 
+ntf-event-payment-info-amount =
+    <b>{ $final_amount } { $currency }</b> { $discount_percent -> 
+    [0] { space }
+    *[more] <strike>{ $original_amount } { $currency }</strike> ({ $discount_percent }%)
+    }
+
 ntf-event-payment-info =
     <blockquote>
     • ID: <code>{ $payment_id }</code>
     • Способ оплаты: { gateway-type }
-    • Сумма: { $payment_amount } { $currency }
+    • Сумма: { ntf-event-payment-info-amount }
     </blockquote>
 
     <blockquote>
@@ -75,7 +81,8 @@ ntf-event-payment-info =
         *[has] (<a href="tg://user?id={ $user_id }">@{ $user_username }</a>)
     }
     </blockquote>
-
+    
+ntf-event-payment-info-plan =
     <blockquote>
     • План: <code>{ $plan_name }</code>
     • Тип: { plan-type }
@@ -84,20 +91,42 @@ ntf-event-payment-info =
     • Длительность: { $plan_duration }
     </blockquote>
 
-ntf-event-subscription-purchase =
-    #SubscriptionPurchase
+ntf-event-payment-info-previous-plan =
+    <blockquote>
+    • План: <code>{ $previous_plan_name }</code> -> <code>{ $plan_name }</code> 
+    • Тип: { $previous_plan_type } -> { plan-type }
+    • Лимит трафика: { $previous_plan_traffic_limit } { unit-gigabyte } -> { $plan_traffic_limit } { unit-gigabyte }
+    • Лимит устройств: { $previous_plan_device_limit } -> { $plan_device_limit }
+    • Длительность: { $previous_plan_duration } -> { $plan_duration }
+    </blockquote>
+
+ntf-event-subscription-new =
+    #EventSubscriptionNew
 
     <b>🔅 Событие: Покупка подписки!</b>
 
     { ntf-event-payment-info }
 
+    { ntf-event-payment-info-plan }
 
-ntf-event-subscription-renewal =
-    #SubscriptionRenewal
+ntf-event-subscription-renew =
+    #EventSubscriptionRenew
 
     <b>🔅 Событие: Продление подписки!</b>
 
     { ntf-event-payment-info }
+
+    { ntf-event-payment-info-plan }
+
+ntf-event-subscription-change =
+    #EventSubscriptionChange
+
+    <b>🔅 Событие: Изменение подписки!</b>
+
+    { ntf-event-payment-info }
+
+    { ntf-event-payment-info-previous-plan }
+
 
 # Notifications
 ntf-throttling-many-requests = <i>⚠️ Вы отправляете слишком много запросов, пожалуйста, подождите немного</i>
@@ -120,10 +149,8 @@ ntf-user-switch-role-dev =
 ntf-maintenance-denied-global = <i>🚧 Бот в режиме обслуживания, попробуйте позже</i>
 ntf-maintenance-denied-purchase= <i>🚧 Бот в режиме обслуживания, Вам придет уведомление когда бот снова будет доступен</i>
 
-
 ntf-plan-wrong-name = <i>❌ Некорректное имя</i>
 ntf-plan-wrong-number= <i>❌ Некорректное число</i>
-ntf-plan-negative-number= <i>❌ Отрицательное число недопустимо</i>
 ntf-plan-save-error = <i>❌ Ошибка сохранения плана</i>
 ntf-plan-name-already-exists = <i>❌ План с таким именем уже существует</i>
 ntf-plan-wrong-allowed-id = <i>❌ Некорректный ID пользователя</i>
@@ -131,7 +158,6 @@ ntf-plan-no-user-found = <i>❌ Пользователь не найден</i>
 ntf-plan-user-already-allowed = <i>❌ Пользователь уже добавлен в список разрешенных</i>
 ntf-plan-updated-success = <i>✅ План успешно обновлен</i>
 ntf-plan-created-success = <i>✅ План успешно создан</i>
-
 
 ntf-gateway-not-configured = <i>❌ Платежный шлюз не настроен</i>
 ntf-gateway-not-configurable = <i>❌ Платежный шлюз не имеет настроек</i>

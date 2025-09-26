@@ -32,10 +32,11 @@ class TransactionService(BaseService):
         self.uow = uow
 
     async def create(self, user: UserDto, transaction: TransactionDto) -> TransactionDto:
-        db_transaction = Transaction(
-            **transaction.model_dump(exclude={"user"}, mode="json"),
-            user_telegram_id=user.telegram_id,
-        )
+        data = transaction.model_dump(exclude={"user"})
+        data["plan"] = transaction.plan.model_dump(mode="json")
+        data["pricing"] = transaction.pricing.model_dump(mode="json")
+
+        db_transaction = Transaction(**data, user_telegram_id=user.telegram_id)
         db_created_transaction = await self.uow.repository.transactions.create(db_transaction)
         return TransactionDto.from_model(db_created_transaction)  # type: ignore[return-value]
 

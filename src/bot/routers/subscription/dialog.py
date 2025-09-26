@@ -16,6 +16,7 @@ from .getters import (
 )
 from .handlers import (
     on_duration_selected,
+    on_get_subscription,
     on_payment_method_selected,
     on_plan_selected,
     on_subscription_plans,
@@ -158,6 +159,13 @@ confirm = Window(
         Url(
             text=I18nFormat("btn-subscription-pay"),
             url=Format("{url}"),
+            when="url",
+        ),
+        Button(
+            text=I18nFormat("btn-subscription-get"),
+            id="get",
+            on_click=on_get_subscription,
+            when=~F["url"],
         ),
     ),
     Row(

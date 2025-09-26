@@ -4,9 +4,10 @@ from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from .plan import PlanSnapshotDto
-    from .user import UserDto
+    from .user import BaseUserDto
 
 from datetime import datetime, timedelta
+from uuid import UUID
 
 from pydantic import Field
 
@@ -16,17 +17,14 @@ from src.core.utils.time import datetime_now
 from .base import TrackableDto
 
 
-class SubscriptionDto(TrackableDto):
+class BaseSubscriptionDto(TrackableDto):
     id: Optional[int] = Field(default=None, frozen=True)
+    user_remna_id: UUID
 
     status: SubscriptionStatus = SubscriptionStatus.ACTIVE
     expire_at: Optional[datetime]
+    url: str
     plan: "PlanSnapshotDto"
-
-    user: Optional["UserDto"] = None
-
-    created_at: Optional[datetime] = Field(default=None, frozen=True)
-    updated_at: Optional[datetime] = Field(default=None, frozen=True)
 
     @property
     def expiry_time(self) -> Optional[timedelta]:
@@ -34,3 +32,10 @@ class SubscriptionDto(TrackableDto):
             return None
 
         return self.expire_at - datetime_now()
+
+    created_at: Optional[datetime] = Field(default=None, frozen=True)
+    updated_at: Optional[datetime] = Field(default=None, frozen=True)
+
+
+class SubscriptionDto(BaseSubscriptionDto):
+    user: "Optional[BaseUserDto]" = None

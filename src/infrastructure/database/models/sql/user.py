@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from .subscription import Subscription
     from .transaction import Transaction
 
-from sqlalchemy import BigInteger, Boolean, Enum, Integer, String
+from sqlalchemy import BigInteger, Boolean, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.enums import Locale, UserRole
@@ -34,12 +34,24 @@ class User(BaseSql, TimestampMixin):
     is_bot_blocked: Mapped[bool] = mapped_column(Boolean, nullable=False)
     is_trial_used: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
-    subscription: Mapped["Subscription"] = relationship(
+    active_subscription_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("subscriptions.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    active_subscription: Mapped[Optional["Subscription"]] = relationship(
+        "Subscription",
+        foreign_keys=[active_subscription_id],
+        lazy="joined",
+    )
+
+    subscriptions: Mapped[list["Subscription"]] = relationship(
         "Subscription",
         back_populates="user",
-        foreign_keys="Subscription.user_telegram_id",
         cascade="all, delete-orphan",
-        lazy="joined",
+        lazy="selectin",
+        primaryjoin="User.telegram_id==Subscription.user_telegram_id",
+        foreign_keys="Subscription.user_telegram_id",
     )
     promocode_activations: Mapped[list["PromocodeActivation"]] = relationship(
         "PromocodeActivation",

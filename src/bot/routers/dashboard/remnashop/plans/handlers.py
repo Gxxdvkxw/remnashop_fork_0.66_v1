@@ -1,4 +1,3 @@
-from decimal import ROUND_UP, Decimal, InvalidOperation
 from typing import Optional
 from uuid import UUID
 
@@ -19,6 +18,7 @@ from src.core.utils.message_payload import MessagePayload
 from src.infrastructure.database.models.dto import PlanDto, PlanDurationDto, PlanPriceDto, UserDto
 from src.services.notification import NotificationService
 from src.services.plan import PlanService
+from src.services.pricing import PricingService
 from src.services.user import UserService
 
 
@@ -369,11 +369,15 @@ async def on_price_input(
         )
         return
 
+    duration_selected = dialog_manager.dialog_data.get("duration_selected")
+    currency_selected = dialog_manager.dialog_data.get("currency_selected")
+
+    if not duration_selected or not currency_selected:
+        return
+
     try:
-        new_price = Decimal(message.text)
-        if new_price <= 0:
-            raise InvalidOperation
-    except InvalidOperation:
+        new_price = PricingService.parse_price(message.text, currency_selected)
+    except ValueError:
         logger.warning(f"{format_log_user(user)} Provided invalid price input: '{message.text}'")
         await notification_service.notify_user(
             user=user,
@@ -386,14 +390,6 @@ async def on_price_input(
 
     if not plan:
         return
-
-    duration_selected = dialog_manager.dialog_data.get("duration_selected")
-    currency_selected = dialog_manager.dialog_data.get("currency_selected")
-
-    # TODO: Check what is the minimum price allowed for payment providers
-    if currency_selected == Currency.XTR:
-        new_price = new_price.quantize(Decimal(1), rounding=ROUND_UP)
-        logger.debug(f"{format_log_user(user)} Quantizing XTR price to integer: '{new_price}'")
 
     for duration in plan.durations:
         if duration.days == duration_selected:

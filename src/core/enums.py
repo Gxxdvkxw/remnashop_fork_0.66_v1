@@ -11,6 +11,12 @@ class UpperStrEnum(StrEnum):
         return name
 
 
+class PurchaseType(UpperStrEnum):
+    NEW = auto()
+    RENEW = auto()
+    CHANGE = auto()
+
+
 class TransactionStatus(UpperStrEnum):
     PENDING = auto()
     COMPLETED = auto()

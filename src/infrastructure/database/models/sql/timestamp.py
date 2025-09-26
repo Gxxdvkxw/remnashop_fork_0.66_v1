@@ -9,13 +9,13 @@ NOW_FUNC: Final[Function[Any]] = func.timezone("UTC", func.now())
 
 class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         server_default=NOW_FUNC,
         nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         server_default=NOW_FUNC,
-        server_onupdate=NOW_FUNC,
+        onupdate=NOW_FUNC,
         nullable=False,
     )

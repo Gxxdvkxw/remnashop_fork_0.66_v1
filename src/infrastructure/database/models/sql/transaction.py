@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from decimal import Decimal
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -8,12 +7,12 @@ if TYPE_CHECKING:
 
 from uuid import UUID
 
-from sqlalchemy import DECIMAL as PG_DECIMAL
 from sqlalchemy import JSON, BigInteger, Enum, ForeignKey, Integer
 from sqlalchemy import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.core.enums import Currency, PaymentGatewayType, TransactionStatus
+from src.core.enums import Currency, PaymentGatewayType, PurchaseType, TransactionStatus
+from src.infrastructure.database.models.dto import PlanSnapshotDto, PriceDetailsDto
 
 from .base import BaseSql
 from .timestamp import TimestampMixin
@@ -26,10 +25,14 @@ class Transaction(BaseSql, TimestampMixin):
     payment_id: Mapped[UUID] = mapped_column(PG_UUID, nullable=False, unique=True)
 
     status: Mapped[TransactionStatus] = mapped_column(Enum(TransactionStatus), nullable=False)
-    gateway: Mapped[PaymentGatewayType] = mapped_column(Enum(PaymentGatewayType), nullable=False)
-    amount: Mapped[Decimal] = mapped_column(PG_DECIMAL, nullable=False)
+    purchase_type: Mapped[PurchaseType] = mapped_column(Enum(PurchaseType), nullable=False)
+    gateway_type: Mapped[PaymentGatewayType] = mapped_column(
+        Enum(PaymentGatewayType), nullable=False
+    )
+
+    pricing: Mapped[PriceDetailsDto] = mapped_column(JSON, nullable=False)
     currency: Mapped[Currency] = mapped_column(Enum(Currency), nullable=False)
-    plan: Mapped[dict] = mapped_column(JSON, nullable=False)
+    plan: Mapped[PlanSnapshotDto] = mapped_column(JSON, nullable=False)
 
     user_telegram_id: Mapped[int] = mapped_column(
         BigInteger,
