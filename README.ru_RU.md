@@ -5,8 +5,7 @@
     <u><b>РУССКИЙ</b></u>
 </p>
 
-
-![remnashop](https://github.com/user-attachments/assets/9c974da1-db66-4fc7-a1e5-0d4a77ad6d09)
+![remnashop](https://github.com/user-attachments/assets/57ba5832-4646-45e1-b082-f8f2f5e82c3e)
 
 **Этот проект представляет собой Telegram-бота для продажи VPN-подписок, интегрированного с Remnawave.**
 
