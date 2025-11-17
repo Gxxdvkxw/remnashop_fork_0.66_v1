@@ -51,15 +51,16 @@ class YoomoneyGateway(BasePaymentGateway):
     async def handle_create_payment(self, amount: Decimal, details: str) -> PaymentResult:
         payment_id = str(uuid.uuid4())
         payload = await self._create_payment_payload(str(amount), details, payment_id)
-        query = "&".join(
-            f"{key.replace('_', '-')}" + "=" + str(value)
-            for key, value in payload.items()
-            if value is not None
-        ).replace(" ", "%20")
+        query = self.API_BASE
+        for value in payload:
+            query += str(value).replace("_", "-") + "=" + str(payload[value])
+            query += "&"
+        query = query[:-1].replace(" ", "%20")
 
         try:
-            response = await self._client.post(query)
-            response.raise_for_status()
+            response = await self._client.post(query, follow_redirects=True)
+            if response.status_code != 302:
+                response.raise_for_status()
             return self._get_payment_data(response.url, payment_id)
 
         except HTTPStatusError as exception:
