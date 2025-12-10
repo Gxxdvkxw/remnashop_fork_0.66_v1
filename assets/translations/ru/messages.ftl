@@ -886,12 +886,12 @@ msg-plan-squads =
     <b>🔗 Сквады</b>
 
     { $internal_squads ->
-    [0] { empty }
+    [0] { space }
     *[HAS] <b>⏺️ Внутренние:</b> { $internal_squads }
     }
 
     { $external_squad ->
-    [0] { empty }
+    [0] { space }
     *[HAS] <b>⏹️ Внешний:</b> { $external_squad }
     }
 

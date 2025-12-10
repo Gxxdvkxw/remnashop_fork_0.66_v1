@@ -257,6 +257,7 @@ class SubscriptionService(BaseService):
             old_value = getattr(target, field)
             new_value = getattr(source, field)
             if old_value != new_value:
+                logger.debug(f"Field '{field}' changed from '{old_value}' to '{new_value}'")
                 setattr(target, field, new_value)
 
         return target
