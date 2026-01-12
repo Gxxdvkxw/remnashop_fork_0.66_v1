@@ -4,10 +4,12 @@ from aiogram_dialog import DialogManager
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
 from fluentogram import TranslatorRunner
+from remnapy import RemnawaveSDK
 
 from src.core.config import AppConfig
 from src.core.exceptions import MenuRenderingError
 from src.core.utils.formatters import (
+    format_country_code,
     format_username_to_url,
     i18n_format_device_limit,
     i18n_format_expire_time,
@@ -18,6 +20,7 @@ from src.services.plan import PlanService
 from src.services.referral import ReferralService
 from src.services.remnawave import RemnawaveService
 from src.services.settings import SettingsService
+
 from src.services.subscription import SubscriptionService
 
 
@@ -183,4 +186,46 @@ async def invite_about_getter(
         "accrual_strategy": settings.accrual_strategy,
         "identical_reward": identical_reward,
         "max_level": max_level,
+    }
+
+
+@inject
+async def info_getter(
+    dialog_manager: DialogManager,
+    settings_service: FromDishka[SettingsService],
+    **kwargs: Any,
+) -> dict[str, Any]:
+    settings = await settings_service.get()
+
+    return {
+        "rules_link": settings.rules_link.get_secret_value(),
+    }
+
+
+@inject
+async def status_getter(
+    dialog_manager: DialogManager,
+    remnawave: FromDishka[RemnawaveSDK],
+    i18n: FromDishka[TranslatorRunner],
+    **kwargs: Any,
+) -> dict[str, Any]:
+    nodes = await remnawave.nodes.get_all_nodes()
+
+    if not nodes:
+        nodes_text = i18n.get("msg-menu-status-empty")
+    else:
+        lines = []
+        for node in nodes:
+            lines.append(
+                i18n.get(
+                    "msg-menu-status-node",
+                    country=format_country_code(code=node.country_code),
+                    name=node.name,
+                    status="ON" if node.is_connected else "OFF",
+                )
+            )
+        nodes_text = "\n".join(lines)
+
+    return {
+        "nodes": nodes_text,
     }
